@@ -13,6 +13,15 @@ class ProG:
         midpoints must be pt_of_I type'''
         self.name = name 
         self.pointList = pointList
+        # when called correctly I can validate right here with
+        # self.validate()   where  the function has been defined
+        # def  validate(self)
+        if ( self.validate()):  
+            print ("Print seems good")
+            print ("Point info:")
+            print ( self.definion_points() )
+            self.pcs=self.pc_list()
+            self.segments=self.ProG_segments()
 
     def definion_points(self):
         for n,p in enumerate(self.pointList):
@@ -155,4 +164,6 @@ if __name__ == "__main__":
            y3.append( pgl.profile_grade(i) )
         plt.plot(x3, y3, 'o', color='blue');
         plt.show()
+        print( pgl.pcs )
+        print( pgl.segments )
     
