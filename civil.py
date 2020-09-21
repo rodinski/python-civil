@@ -1,12 +1,12 @@
 import random
-def format_STA (sta):
-    if sta < 0:
-        return "can't represent a negative station"
-    as_str = "{0:.2f}".format(sta) #rounded to 2 decimals
-    back =  float(as_str[-5:])
-    front = int( "0" + as_str[:-5])
-    return  "{:d}+{:05.2f}".format( front, back )
 
+def format_STA( in_sta, decimal_round = 2 ):
+    if (in_sta <  0): 
+        return "Negative STA"
+    in_sta =  round(in_sta, decimal_round ) 
+    whole_sta = int( in_sta / 100 )
+    plus_ft    = ( in_sta % 100 )
+    return f"{whole_sta:d}+{plus_ft:0{3+decimal_round}.{decimal_round}f}"
 
 #==========================================================
 def parse_ft_in(s):
@@ -142,33 +142,24 @@ def bar_wt(size):
   
 if __name__ ==  '__main__':
     pass
-    '''
-    print( format_STA( 123.45))
-    print( format_STA( 11.23456))
-    print( format_STA( 1.23456))
-    print( parse_ft_in( "1 2 3 4  " ))
-    print( parse_ft_in( "  -1  2   " ))
-    print( parse_ft_in( "  - 100  11  15 16   " ))   
-    '''
     from collections import Counter
-    c = Counter()
-    s = set() 
-    measures = {}
-    '''
-    for i in range(20):
-        r = (random.random()-0.5 ) * 40 
-        print( "_" + feet2callout(r ) + "_" )
-    '''
+    from matplotlib import pyplot as plt
     s1 = 0
     s2 = 20
     e1 = 100
     e2 = 100
     c  = 0.75
+    y = []
+    s = []
     for sta in range (s1, s2+1):
         sc = slope_camber ( sta, s1, e1, s2, e2, c)
+        s.append(sta)
+        y.append(sc)
         print(f"elevation: {sc}")
     print( bar_area(11) )
     print( bar_wt(11) )
+    plt.plot( s, y, 'ro')
+    plt.show()
 
 
 
@@ -257,44 +248,5 @@ sub plateslopes {
 =cut
 }
 
-sub bar_a {
-  use Switch;
-  my $bar = shift;
-  switch ($bar) {
-    case( 3 )  {return 0.11}
-    case( 4 )  {return 0.2 }
-    case( 5 )  {return 0.31}
-    case( 6 )  {return 0.44}
-    case( 7 )  {return 0.6 }
-    case( 8 )  {return 0.79}
-    case( 9 )  {return 1   }
-    case( 10)  {return 1.27}
-    case( 11)  {return 1.56}
-    case( 14)  {return 2.25}
-    case( 18)  {return 4   }
-    else       { return "NA"}
-  }
-  return "NA";
-}
-
-sub bar_wt {
-  use Switch;
-  my $bar = shift;
-  switch ($bar) {
-    case (3 ) { return 0.38}
-    case (4 ) { return 0.67}
-    case (5 ) { return 1.04}
-    case (6 ) { return 1.50}
-    case (7 ) { return 2.04}
-    case (8 ) { return 2.67}
-    case (9 ) { return 3.40}
-    case (10) { return 4.30}
-    case (11) { return 5.31}
-    case (14) { return 7.65}
-    case (18) { return 13.60}
-    else      { return "NA"}
-  }
-  return "NA";
-}
 
 '''

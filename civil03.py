@@ -1,5 +1,7 @@
 import collections 
 import matplotlib.pyplot as plt
+import yaml
+import json
 
 point = collections.namedtuple('Point', " sta elev ")
 pi    = collections.namedtuple('Point_of_Intersection', " sta elev Length") 
@@ -9,8 +11,14 @@ seg =   collections.namedtuple('ProG_segment',"sta_1 elev_1 grade_1 sta_2 elev_2
 class ProG:
     def __init__(self, name, pointList ):
         ''' ProG are defined with a list.  
-        The list must start and end with a point type
-        midpoints must be pt_of_I type'''
+        The list must start and end with a "named point tuple"
+        midpoints must be "named pi tuples" 
+        Once the input is validated two lists are created
+        self.pog = list of "named pc and pt tuples"
+        self.set = list of "named segment tuples"
+
+
+        '''
         self.name = name 
         self.pointList = pointList
         # when called correctly I can validate right here with
@@ -27,6 +35,15 @@ class ProG:
         for n,p in enumerate(self.pointList):
             print( f"{n}    {p}")
 
+    def __repr__(self):
+        tmp = f'{self.__class__.__name__} = \n'
+        tmp += f'    name:{self.name}'
+        tmp += "\n    ["
+        for n, pc in enumerate(self.pc_list() ):
+            tmp +=  f"\n    {n}- {pc} "
+        tmp += "\n    ]"
+        return tmp
+        
     def validate(self):
         ''' Return true if list start and ends with points
         and has pt_of_I for midpoints.  PC and PT must be in order'''
@@ -53,8 +70,10 @@ class ProG:
 
 
     def pc_list(self):
-        ''' Produces a list of point actually on the grade line.  Takes pt_on_I and 
-         convets them to PC and PT.  Note, ProG is defined with start, PI's and end.'''
+        ''' Produces a list of point actually on the grade line.  Takes PI points and 
+         convets them to PC and PT.  Note, ProG is defined with start, PI's and end.
+         named pc tuple = " sta elev grade "
+         '''
         pl = self.pointList
         pc_list = list()           #empty
         
@@ -82,7 +101,11 @@ class ProG:
         return pc_list
     
     def ProG_segments(self):
-        ''' Produce a list of segment where the rate of change on the segment is constant'''
+        ''' Produce a list of segment where the rate of change on the segment is constant
+        named segment tuple = "sta_1 elev_1 grade_1 sta_2 elev_2 grade_2 Length rate"
+        
+        could it have been   "pc1 s,e,g" ; pc2 "s,e,g", :  L  rate" 
+        '''
         segments = []
         pcs = self.pc_list()
         for start, end in zip( pcs[:-1],pcs[1:] ):
@@ -133,11 +156,19 @@ def L_over_2(near, far):
     elev = near.elev + near.Length/2.0 * grade 
     return pog( sta, elev, sign*grade)
 
+def pretty(d, indent=0):
+   for key, value in d.items():
+      print('\t' * indent + str(key) + ":", end='')
+      if isinstance(value, dict):
+         pretty(value, indent+1)
+      else:
+         print('\t' * (indent+1) + str(value))
+
 
 if __name__ == "__main__":
     print ("start")
-    start = point( 100, 10)
-    pi_1  = pi( 200, 20, 29)
+    start = point( -100, 10)
+    pi_1  = pi( 200, 20, 80)
     pi_2  = pi( 300,  3, 29)
     pi_3 =  pi( 400, 44, 160)
     end =   point(500, 44)
@@ -153,7 +184,9 @@ if __name__ == "__main__":
            x.append(i.sta)
            y.append(i.elev)
 
-        plt.style.use('seaborn-whitegrid')
+        fig, ax = plt.subplots()
+        plt.figure(figsize=(16,8))  #get a plt started with know size
+        plt.style.use('seaborn-whitegrid' )
         plt.plot(x, y, 'o', color='red');
 
         
@@ -163,7 +196,13 @@ if __name__ == "__main__":
            x3.append(i)
            y3.append( pgl.profile_grade(i) )
         plt.plot(x3, y3, 'o', color='blue');
-        plt.show()
+        #plt.show()
         print( pgl.pcs )
-        print( pgl.segments )
+        #print( pgl.segments )
+        seg = pgl.segments
+        #print( json.dumps(seg) )
+        #print ( plt.get_current_fig_manager() )
+        import random
+        for i in range( 40):
+            print( formatSTA(  random.random()*999999 ) ) 
     
